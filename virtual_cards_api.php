@@ -43,9 +43,6 @@ class API {
     $query = self::normalizeQuery($query, ["signature"]);
     $signString = self::signatureData($method, $host, $path, $query);
     $expectedSign = base64_encode(hash_hmac("sha256", $signString, $this->secret, true));
-    error_log($signString);
-    error_log($expectedSign);
-    error_log($gotSign);
     return $expectedSign === $gotSign;
   }
 
