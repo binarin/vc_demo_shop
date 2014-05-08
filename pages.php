@@ -62,10 +62,10 @@ class ResultPage {
     ) {
       $order = Order::load($_GET["order_id"]);
 
-      if ($api->isStatusFinal($order["status"])) {
-        $order->addLog("Финальный статус '{$order["status"]}' уже был получен");
+      if ($api->isStatusFinal($order->status)) {
+        $order->addLog("Финальный статус '{$order->status}' уже был получен");
       } elseif ($api->isStatusFinal($_GET["status"])) {
-        $order->addLog("Финальный статус '{$order["status"]}' получен раньше callback'а");
+        $order->addLog("Финальный статус '{$order->status}' получен раньше callback'а");
         $order->changeStatus($_GET["status"]);
       } else {
         throw Exception("Странное состояния системы");
