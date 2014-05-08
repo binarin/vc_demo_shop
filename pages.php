@@ -1,4 +1,5 @@
 <?php
+
 // -*- coding: utf-8-unix -*-
 class Page {
   public static function dispatch() {
@@ -34,43 +35,11 @@ class StatusPage {
     ) {
       $order = Order::load($_GET["order_id"]);
       return ["title" => "Заказ {$order->id}",
-              "content" => $this->renderOrder($order)];
+              "content" => "<h1>Спасибо за покупку нашего слона!</h1>"];
     } else {
       return ["title" => "Неправильная подпись",
               "content" => "<h1>Нет прав на просмотр данной записи</h1>"];
     }
-  }
-
-  private function renderOrder($order) {
-    ob_start(); ?>
-
-  <h1>Заказ <?php echo $order->id ?></h1>
-  <p>Статус: <?php echo $order->status ?></p>
-  <h2>Записи в логах</h2>
-  <ul>
-    <?php foreach ($order->notifications["log"] as $logRecord) : ?>
-      <li><?php echo $logRecord ?></li>
-    <?php endforeach; ?>
-  </ul>
-  <h2>Полученные нотификации</h2>
-  <table class="table">
-    <tr>
-      <th>Дата</td>
-      <th>Идентификатор</td>
-      <th>Статус</td>
-    </tr>
-    <?php foreach ($order->notifications["notifications"] as $id => $data) : ?>
-      <tr>
-        <td><?php echo $data["timestamp"] ?></td>
-        <td><?php echo $id ?></td>
-        <td><?php echo $data["status"] ?></td>
-      </tr>
-    <?php endforeach; ?>
-  </table>
-    <?php
-    $result = ob_get_contents();
-    ob_end_clean();
-    return $result;
   }
 }
 
@@ -135,6 +104,7 @@ class PayPage {
   }
 
   public function run() {
+    header("refresh: 5; url=/pay/{$this->order->id}");
     $config = new Config();
     $api = new VirtualCards\API($config->vcUrl, $config->vcServiceId, $config->vcSecret);
     $payLink = $api->payLink($this->order->id, 10.0);
@@ -144,9 +114,42 @@ class PayPage {
       <h1>$title</h1>
       <h2>Заказ #{$this->order->id}</h2>
       <p>Стоимость {$this->order->amount} р.</p>
-      <a href='$payLink' type='button' class='btn btn-primary btn-lg'>Купить виртуальную карту для оплаты</a>
+      <a target='_blank' href='$payLink' type='button' class='btn btn-primary btn-lg'>Купить виртуальную карту для оплаты</a>
       <button type='button' class='btn btn-primary btn-lg'>Оплатить с помощью VISA/MasterCard</button>
-    ";
+    " . $this->renderOrder($this->order);
     return array("title" => $title, "content" => $content);
   }
+
+  private function renderOrder($order) {
+    ob_start(); ?>
+
+  <h1>Отладочная информация</h1>
+  <p>Статус: <?php echo $order->status ?></p>
+  <h2>Записи в логах</h2>
+  <ul>
+    <?php foreach ($order->notifications["log"] as $logRecord) : ?>
+      <li><?php echo $logRecord ?></li>
+    <?php endforeach; ?>
+  </ul>
+  <h2>Полученные нотификации</h2>
+  <table class="table">
+    <tr>
+      <th>Дата</td>
+      <th>Идентификатор</td>
+      <th>Статус</td>
+    </tr>
+    <?php foreach ($order->notifications["notifications"] as $id => $data) : ?>
+      <tr>
+        <td><?php echo $data["timestamp"] ?></td>
+        <td><?php echo $id ?></td>
+        <td><?php echo $data["status"] ?></td>
+      </tr>
+    <?php endforeach; ?>
+  </table>
+    <?php
+    $result = ob_get_contents();
+    ob_end_clean();
+    return $result;
+  }
+
 }
