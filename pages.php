@@ -7,7 +7,7 @@ class Page {
       $page = new PayPage($matches["orderId"]);
     } elseif ($path_info === '/create') {
       $page = new CreatePage();
-    } elseif ($path_info === '/status') {
+    } elseif ($path_info === '/result') {
       $page = new StatusPage();
     } elseif ($path_info === '/callback') {
       $page = new CallbackPage();
