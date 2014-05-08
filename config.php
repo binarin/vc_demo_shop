@@ -5,12 +5,14 @@ class Config {
   public $vcUrl;
   public $vcServiceId;
   public $vcSecret;
+  public $publicUrl;
 
   public function __construct()
   {
     $this->vcUrl = getenv("VC_URL");
     $this->vcServiceId = getenv("VC_SERVICE_ID");
     $this->vcSecret = getenv("VC_SECRET");
+    $this->publicUrl = getenv("PUBLIC_URL");
   }
 
   private static $dbh;

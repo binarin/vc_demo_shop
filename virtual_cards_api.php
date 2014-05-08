@@ -11,6 +11,17 @@ class API {
     $this->secret = $secret;
   }
 
+  /**
+   * Является ли указанный статус финальным. Не-финальные статусы
+   * нужны только для информации.
+   **/
+  public function isStatusFinal($status) {
+    return in_array($status, ["failed_payment", "requested_card", "payed"]);
+  }
+
+  /**
+   * Генерирует ссылку для перехода на оплату.
+   **/
   public function payLink($orderId, $amount, $currency = "RUB", $phone = null) {
     $query = ["service_id" => $this->serviceId,
               "order_id" => $orderId,
@@ -25,8 +36,22 @@ class API {
     return $this->url . "?" . http_build_query($query);
   }
 
+  /**
+   * Проверка подписи (для нотификаций и возвратов пользователя).
+   */
+  public function validateSignature($gotSign, $method, $host, $path, $query) {
+    $query = self::normalizeQuery($query, ["signature"]);
+    $signString = self::signatureData($method, $host, $path, $query);
+    $expectedSign = base64_encode(hash_hmac("sha256", $signString, $this->secret, true));
+    error_log($signString);
+    error_log($expectedSign);
+    error_log($gotSign);
+    return $expectedSign === $gotSign;
+  }
+
   private static function normalizeHost($host) {
     $parsed = parse_url($host);
+    $portPart = "";
     if (isset($parsed["port"])) {
       $portPart = ":{$parsed['port']}";
     }
@@ -38,8 +63,15 @@ class API {
     return $parsed["path"];
   }
 
-  private static function normalizeQuery($query) {
+  private static function normalizeQuery($query, $delete = array()) {
+    if (!is_array($query)) {
+      $queryAsStr = $query;
+      parse_str($queryAsStr, $query);
+    }
     ksort($query);
+    foreach ($delete as $key) {
+      unset($query[$key]);
+    }
     return http_build_query($query);
   }
 

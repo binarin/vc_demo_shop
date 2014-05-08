@@ -17,8 +17,8 @@ $data = Page::dispatch();
 if (!$data) {
     die();
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,6 +29,7 @@ if (!$data) {
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/styles.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -38,11 +39,23 @@ if (!$data) {
     <![endif]-->
   </head>
   <body>
-    <div class="navbar navbar-inverse" role="navigation">
-      <div class="container-fluid">
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
         <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
           <a class="navbar-brand" href="/">Слоны!</a>
         </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="https://github.com/binarin/vc_demo_shop">Исходный код</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
       </div>
     </div>
 

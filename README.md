@@ -9,3 +9,4 @@ vc_demo_shop
     );
 
     heroku config:set VC_URL=http://.../pay VC_SERVICE_ID=... VC_SECRET='...'
+    heroku config:set PUBLIC_URL='http://vc-demo.herokuapp.com/'
