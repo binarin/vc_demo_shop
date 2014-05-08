@@ -7,3 +7,5 @@ vc_demo_shop
       status text not null default 'new',
       notifications text
     );
+
+    heroku config:set VC_URL=http://.../pay VC_SERVICE_ID=... VC_SECRET='...'

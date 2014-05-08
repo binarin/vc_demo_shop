@@ -58,7 +58,7 @@ class PayPage {
       <h2>Заказ #{$this->order['id']}</h2>
       <p>Стоимость {$this->order['amount']} р.</p>
       <a href='$payLink' type='button' class='btn btn-primary btn-lg'>Купить виртуальную карту для оплаты</a>
-      <button type='button' class='btn btn-primary btn-lg'>Оплатить VISA/MasterCard</button>
+      <button type='button' class='btn btn-primary btn-lg'>Оплатить с помощью VISA/MasterCard</button>
     ";
     return array("title" => $title, "content" => $content);
   }
