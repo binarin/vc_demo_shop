@@ -69,4 +69,10 @@ class Order {
     $sth->execute([$this->status, json_encode($this->notifications), $this->id]);
     $this->setData($sth->fetch(PDO::FETCH_ASSOC));
   }
+
+  public function addLog($record) {
+    $ts = gmstrftime("%Y-%m-%d %H:%M:%S");
+    $this->notifications["log"] []= "[$ts] {$record}";
+    $this->save();
+  }
 }

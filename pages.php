@@ -6,10 +6,12 @@ class Page {
     $path_info = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "";
     if (preg_match('/^\/pay\/(?P<orderId>\d+)/', $_SERVER['PATH_INFO'], $matches)) {
       $page = new PayPage($matches["orderId"]);
+    } elseif (preg_match('/^\/status\/(?P<orderId>\d+)/', $_SERVER['PATH_INFO'], $matches)) {
+      $page = new StatusPage($matches["orderId"]);
     } elseif ($path_info === '/create') {
       $page = new CreatePage();
     } elseif ($path_info === '/result') {
-      $page = new StatusPage();
+      $page = new ResultPage();
     } elseif ($path_info === '/callback') {
       $page = new CallbackPage();
     } else {
@@ -20,6 +22,31 @@ class Page {
 }
 
 class StatusPage {
+  private $order;
+  public function __construct($orderId) {
+    $this->order = Order::load($orderId);
+  }
+
+  public function run() {
+    switch ($this->order->status) {
+      case "payed":
+        $content = "<h1>Заказ #{$this->order->id} оплачен</h1><p>Спасибо за покупку нашего слона! Для его получения бла-бла-бла....</p>";
+        break;
+      case "failed_payment":
+        $content = "<h1>Ошибка оплаты</h1><p>Попробуйте <a href='/status/{$order->id}'>ещё раз</a></p>";
+        break;
+      case "requested_card":
+        $content = "<h1>Получены данные карты</h1><p>Вы можете оплатить слона при помощи полученной карты <a href='/status/{$order->id}'>ещё раз</a></p>";
+        break;
+      default:
+        $content = "<h1>Как Вы здесь оказались?</h1><p>Этого не должно было случиться!</p>";
+    }
+    return ["title" => "Состояние заказа #{$this->order->id}",
+            "content" => $content];
+  }
+}
+
+class ResultPage {
   public function run() {
     $config = new Config();
     $api = new VirtualCards\API($config->vcUrl, $config->vcServiceId, $config->vcSecret);
@@ -34,11 +61,19 @@ class StatusPage {
       )
     ) {
       $order = Order::load($_GET["order_id"]);
-      return ["title" => "Заказ {$order->id}",
-              "content" => "<h1>Спасибо за покупку нашего слона!</h1>"];
+
+      if ($api->isStatusFinal($order["status"])) {
+        $order->addLog("Финальный статус '{$order["status"]}' уже был получен");
+      } elseif ($api->isStatusFinal($_GET["status"])) {
+        $order->addLog("Финальный статус '{$order["status"]}' получен раньше callback'а");
+        $order->changeStatus($_GET["status"]);
+      } else {
+        throw Exception("Странное состояния системы");
+      }
+      header("Location: /status/{$order->id}");
     } else {
       return ["title" => "Неправильная подпись",
-              "content" => "<h1>Нет прав на просмотр данной записи</h1>"];
+              "content" => "<h1>Запрос проигнорирован</h1>"];
     }
   }
 }
