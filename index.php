@@ -1,24 +1,31 @@
-<?php // -*- coding: utf-8-unix -*-
-      require('vendor/autoload.php');
+<?php
+// -*- coding: utf-8-unix -*-
+require('vendor/autoload.php');
+require('virtual_cards_api.php');
+require('config.php');
+require('pages.php');
+require('order.php');
 
-      use Monolog\Logger;
-      use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
-      // create a log channel to STDERR
-      $log = new Logger('name');
-      $log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
+// create a log channel to STDERR
+$log = new Logger('name');
+$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 
-      // add records to the log
-      $log->addWarning("Running a beta version of Heroku's PHP support");
+$data = Page::dispatch();
+if (!$data) {
+    die();
+}
+
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title><?php echo $data["title"] ?></title>
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
@@ -31,7 +38,17 @@
     <![endif]-->
   </head>
   <body>
-    <h1>Hello, world!</h1>
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Слоны!</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <?php echo $data["content"] ?>
+    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
